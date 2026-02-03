@@ -22,7 +22,7 @@ export type Song = {
     genre: string;
 
     cover: string;
-
+    likes: number;
     score: SongScore;
 };
 
