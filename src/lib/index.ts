@@ -7,7 +7,7 @@ export type NoteEvent = {
 
 export type SongScore = {
     bpm: number;
-    instrument: 'synth' | 'membrane' | 'metal';
+    instrument: 'synth' | 'metal';
     melody: NoteEvent[];
     bass: NoteEvent[];
 };

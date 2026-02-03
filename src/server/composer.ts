@@ -61,9 +61,12 @@ export function generateSongScore(rng: RandomGenerator): SongScore {
         }
     });
 
+    // Random choice
+    const instrument = rng.pickArray(['synth', 'metal']);
+
     return {
         bpm,
-        instrument: 'synth',
+        instrument: instrument as 'synth' | 'metal',
         melody,
         bass,
     };
