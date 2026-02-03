@@ -1,7 +1,7 @@
 export type NoteEvent = {
     note: string;
     duration: string;
-    time: number;
+    time: string | number;
     velocity: number;
 };
 

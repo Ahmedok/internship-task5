@@ -30,7 +30,7 @@ export class RandomGenerator {
         return intVal / 1000000;
     }
 
-    pickArray<T>(arr: T[]): T {
+    pickArray<T>(arr: readonly T[]): T {
         if (arr.length === 0) throw new Error('Cannot pick from empty array');
         const idx = this.nextInt(0, arr.length - 1);
         return arr[idx];
