@@ -1,0 +1,26 @@
+{
+  "name": "task5",
+  "version": "1.0.0",
+  "description": "Monorepo for building Task 5",
+  "main": "index.js",
+  "scripts": {
+    "install:all": "npm install && cd src/client && npm install && cd ../server && npm install && cd ../lib && npm install",
+    "dev": "concurrently -n \"SERVER,CLIENT\" -c \"blue,magenta\" \"npm run dev --prefix src/server\" \"npm run dev --prefix src/client\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ahmedok/internship-task5.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Ahmedok/internship-task5/issues"
+  },
+  "homepage": "https://github.com/Ahmedok/internship-task5#readme",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
