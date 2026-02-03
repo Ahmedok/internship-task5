@@ -42,7 +42,7 @@ app.get('/api/data', (req: Request, res: Response): void => {
             const absoluteIndex = startAbsoluteIndex + i + 1;
 
             // Seed + index combo
-            const songSeed = `${seed}_${absoluteIndex.toString()}`;
+            const songSeed = `${seed}_${locale}_${absoluteIndex.toString()}`;
             const rng = new RandomGenerator(songSeed);
 
             // local Faker sync
