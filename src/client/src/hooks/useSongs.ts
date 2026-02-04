@@ -7,22 +7,19 @@ type UseSongsParams = {
     seed: string;
     locale: string;
     likes: number;
+    mode: 'infinite' | 'pagination';
 };
 
-export function useSongs({ seed, locale, likes }: UseSongsParams) {
+export function useSongs({ seed, locale, likes, mode }: UseSongsParams) {
     const [songs, setSongs] = useState<Song[]>([]);
     const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-
-    const pageRef = useRef(1);
-    const isFetchingRef = useRef(false);
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
 
     const abortControllerRef = useRef<AbortController | null>(null);
 
     const fetchBatch = useCallback(
-        async (pageToFetch: number, resetList = false) => {
-            if (isFetchingRef.current && !resetList) return;
-
+        async (pageToFetch: number, isReplace: boolean) => {
             if (abortControllerRef.current) {
                 abortControllerRef.current.abort();
             }
@@ -30,9 +27,7 @@ export function useSongs({ seed, locale, likes }: UseSongsParams) {
             const controller = new AbortController();
             abortControllerRef.current = controller;
 
-            isFetchingRef.current = true;
             setIsLoading(true);
-            setError(null);
 
             try {
                 const params = new URLSearchParams({
@@ -42,30 +37,32 @@ export function useSongs({ seed, locale, likes }: UseSongsParams) {
                     likes: likes.toString(),
                 });
 
-                const res = await fetch(`${API_URL}?${params.toString()}`);
-                if (!res.ok) throw new Error('Network response was not OK');
+                const res = await fetch(`${API_URL}?${params.toString()}`, {
+                    signal: controller.signal,
+                });
+
+                if (!res.ok) throw new Error(`Fetch error: ${res.status.toString()}`);
 
                 const data = (await res.json()) as unknown as ApiResponse;
 
-                setSongs((prev) => {
-                    if (resetList) return data.songs;
+                setSongs((prevSongs) => {
+                    if (isReplace) return data.songs;
                     // Duplicate protection
-                    const newIds = new Set(data.songs.map((s) => s.id));
-                    const filteredPrev = prev.filter((s) => !newIds.has(s.id));
-                    return [...filteredPrev, ...data.songs];
+                    const existingIds = new Set(prevSongs.map((s) => s.id));
+                    const uniqueNewSongs = data.songs.filter((s) => !existingIds.has(s.id));
+                    return [...prevSongs, ...uniqueNewSongs];
                 });
+
+                setHasMore(data.songs.length > 0);
             } catch (err) {
                 if (err instanceof Error && err.name === 'AbortError') {
                     console.log('Fetch aborted');
                     return;
                 }
-
-                console.log(err);
-                setError('Failed to load songs');
+                console.error('Failed to load songs:', err);
             } finally {
                 if (abortControllerRef.current === controller) {
                     setIsLoading(false);
-                    isFetchingRef.current = false;
                     abortControllerRef.current = null;
                 }
             }
@@ -75,22 +72,22 @@ export function useSongs({ seed, locale, likes }: UseSongsParams) {
 
     // Seed/locale change reset
     useEffect(() => {
-        pageRef.current = 1;
+        setPage(1);
         void fetchBatch(1, true);
+    }, [seed, locale, likes, mode, fetchBatch]);
 
-        return () => {
-            if (abortControllerRef.current) {
-                abortControllerRef.current.abort();
-            }
-        };
-    }, [seed, locale, likes, fetchBatch]);
+    const setPageManual = (newPage: number) => {
+        setPage(newPage);
+        void fetchBatch(newPage, true);
+    };
 
-    const loadMore = useCallback(() => {
-        if (!isFetchingRef.current) {
-            pageRef.current += 1;
-            void fetchBatch(pageRef.current, false);
+    const loadMore = () => {
+        if (!isLoading && hasMore) {
+            const nextPage = page + 1;
+            setPage(nextPage);
+            void fetchBatch(nextPage, false);
         }
-    }, [fetchBatch]);
+    };
 
-    return { songs, isLoading, error, loadMore };
+    return { songs, isLoading, page, hasMore, loadMore, setPageManual };
 }

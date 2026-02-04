@@ -15,7 +15,7 @@ type ToolbarProps = {
 
 const LOCALES = [
     { value: 'en_US', label: 'English (USA)' },
-    { value: 'ru', label: 'Russian' },
+    { value: 'de', label: 'German' },
 ];
 
 export const Toolbar: React.FC<ToolbarProps> = ({
