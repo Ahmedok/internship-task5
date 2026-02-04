@@ -3,6 +3,7 @@ import * as Tone from 'tone';
 import { BlobWriter, BlobReader, ZipWriter } from '@zip.js/zip.js';
 import lamejs from '@breezystack/lamejs';
 import type { Song } from '../../../lib';
+import { createBassSynth, createMelodySynth } from '../audioConfig';
 
 // Helper functions
 
@@ -64,25 +65,8 @@ export function useSongExport() {
         const duration = 15;
 
         const buffer = await Tone.Offline(({ transport }) => {
-            let synth: Tone.PolySynth | Tone.PolySynth<Tone.MetalSynth>;
-            if (song.score.instrument === 'metal') {
-                synth = new Tone.PolySynth(Tone.MetalSynth, {
-                    harmonicity: 12,
-                    resonance: 800,
-                    modulationIndex: 20,
-                    envelope: { decay: 0.4, release: 0.2 },
-                    volume: -15,
-                }).toDestination();
-            } else {
-                synth = new Tone.PolySynth(Tone.Synth, {
-                    oscillator: { type: 'triangle' },
-                    envelope: { attack: 0.02, decay: 0.1, sustain: 0.3, release: 1 },
-                    volume: -5,
-                }).toDestination();
-            }
-
-            const bass = new Tone.MembraneSynth().toDestination();
-            bass.volume.value = -5;
+            const synth = createMelodySynth(song.score.instrument).toDestination();
+            const bass = createBassSynth().toDestination();
 
             const { bpm, melody, bass: bassLines } = song.score;
             transport.bpm.value = bpm;

@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import * as Tone from 'tone';
 import type { Song } from '../../../lib';
+import { createMelodySynth, createBassSynth } from '../audioConfig';
 
 export function useAudioPlayer() {
     const [currentSongId, setCurrentSongId] = useState<string | null>(null);
@@ -48,31 +49,11 @@ export function useAudioPlayer() {
             // AudioContext init
             await Tone.start();
 
-            // Instrument:
-            let synth: Tone.PolySynth | Tone.PolySynth<Tone.MetalSynth>;
-
-            // Melody polysynth
-            if (song.score.instrument === 'metal') {
-                // Metal synth
-                synth = new Tone.PolySynth(Tone.MetalSynth, {
-                    harmonicity: 12,
-                    resonance: 800,
-                    modulationIndex: 20,
-                    envelope: { decay: 0.4, release: 0.2 },
-                    volume: -15,
-                }).toDestination();
-            } else {
-                // Normal synth
-                synth = new Tone.PolySynth(Tone.Synth, {
-                    oscillator: { type: 'triangle' },
-                    envelope: { attack: 0.02, decay: 0.1, sustain: 0.3, release: 1 },
-                    volume: -10,
-                }).toDestination();
-            }
+            // Melody polysynth (refactored to audioConfig)
+            const synth = createMelodySynth(song.score.instrument).toDestination();
 
             // Bass membrane
-            const bass = new Tone.MembraneSynth().toDestination();
-            bass.volume.value = -5;
+            const bass = createBassSynth().toDestination();
 
             synthRef.current = synth;
             bassSynthRef.current = bass;
