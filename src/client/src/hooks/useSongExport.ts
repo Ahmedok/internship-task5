@@ -71,13 +71,18 @@ export function useSongExport() {
             const { bpm, melody, bass: bassLines } = song.score;
             transport.bpm.value = bpm;
 
-            new Tone.Part((time, note) => {
-                synth.triggerAttackRelease(note.note, note.duration, time, note.velocity);
-            }, melody).start(0);
+            // Using .schedule instead
+            melody.forEach((note) => {
+                transport.schedule((time) => {
+                    synth.triggerAttackRelease(note.note, note.duration, time, note.velocity);
+                }, note.time);
+            });
 
-            new Tone.Part((time, note) => {
-                bass.triggerAttackRelease(note.note, note.duration, time, note.velocity);
-            }, bassLines).start(0);
+            bassLines.forEach((note) => {
+                transport.schedule((time) => {
+                    bass.triggerAttackRelease(note.note, note.duration, time, note.velocity);
+                }, note.time);
+            });
 
             transport.start();
         }, duration);
@@ -87,14 +92,18 @@ export function useSongExport() {
 
     const exportZip = useCallback(async (songs: Song[]) => {
         if (songs.length === 0) return;
+
+        // Create a snapshot of songs to prevent mutations during async export
+        const songsSnapshot = songs.map((s) => ({ ...s, score: { ...s.score } }));
+
         setIsExporting(true);
         setProgress(0);
 
         try {
             const zipWriter = new ZipWriter(new BlobWriter('application/zip'));
 
-            for (let i = 0; i < songs.length; i++) {
-                const song = songs[i];
+            for (let i = 0; i < songsSnapshot.length; i++) {
+                const song = songsSnapshot[i];
 
                 const buffer = await renderSongToBuffer(song);
 
@@ -109,7 +118,7 @@ export function useSongExport() {
 
                 await zipWriter.add(`${safeName}.mp3`, new BlobReader(mp3Blob));
 
-                setProgress(Math.round(((i + 1) / songs.length) * 100));
+                setProgress(Math.round(((i + 1) / songsSnapshot.length) * 100));
             }
 
             const zipBlob = await zipWriter.close();
