@@ -91,12 +91,12 @@ function App() {
     // Table view
     const tableHeaderContent = () => (
         <tr className="text-xs font-bold text-gray-400 uppercase tracking-wider">
-            <th className="py-3 px-4 w-12 text-center">#</th>
+            <th className="py-3 px-4 w-16 text-center">#</th>
             <th className="py-3 px-4">Title</th>
-            <th className="py-3 px-4 hidden md:table-cell">Artist</th>
-            <th className="py-3 px-4 hidden lg:table-cell">Album</th>
-            <th className="py-3 px-4 hidden sm:table-cell">Genre</th>
-            <th className="py-3 px-4 text-right w-24">Likes</th>
+            <th className="py-3 px-4 w-1/5 hidden sm:table-cell">Artist</th>
+            <th className="py-3 px-4 w-1/5 hidden xl:table-cell">Album</th>
+            <th className="py-3 px-4 w-1/6 hidden lg:table-cell">Genre</th>
+            <th className="py-3 px-4 w-28 text-right">Likes</th>
         </tr>
     );
 
@@ -135,7 +135,7 @@ function App() {
                     <table
                         {...props}
                         ref={ref}
-                        className="w-full text-left border-collapse table-fixed"
+                        className="w-full text-left border-collapse table-auto xl:table-fixed [&_tbody_tr:hover_td]:bg-gray-50"
                     />
                 ),
             ),
@@ -149,7 +149,6 @@ function App() {
         [],
     );
 
-    // THE render
     return (
         <div className="flex flex-col h-screen bg-gray-50 text-gray-900 overflow-hidden font-sans">
             {/* Header */}
@@ -167,98 +166,104 @@ function App() {
                 />
 
                 {/* Sub-header */}
-                <div className="bg-white border-b border-gray-200 px-4 py-2 flex justify-between items-center text-xs font-medium text-gray-500">
-                    {/* Left */}
-                    <div className="flex items-center gap-2">
-                        <FontAwesomeIcon icon={faMusic} className="text-blue-500" />
-                        <span>{songs.length} songs loaded</span>
-                    </div>
+                <div className="border-b border-gray-200 bg-white">
+                    <div className="max-w-7xl mx-auto bg-white px-4 py-2 flex justify-between items-center text-xs font-medium text-gray-500">
+                        {/* Left */}
+                        <div className="flex items-center gap-2">
+                            <FontAwesomeIcon icon={faMusic} className="text-blue-500" />
+                            <span>{songs.length} songs loaded</span>
+                        </div>
 
-                    {/* Right */}
-                    <div className="flex items-center gap-4">
-                        {viewMode === 'table' && (
-                            <div className="flex items-center gap-2 animate-in fade-in slide-in-from-right-2 duration-300">
-                                <span className="hidden sm:inline">Rows:</span>
-                                <select
-                                    value={limit}
-                                    onChange={handleLimitChange}
-                                    className="bg-white border border-gray-300 text-gray-700 text-xs rounded focus:ring-blue-500 focus:border-blue-500 block p-1 py-1.5 cursor-pointer shadow-sm"
+                        {/* Right */}
+                        <div className="flex items-center gap-4">
+                            {viewMode === 'table' && (
+                                <div className="flex items-center gap-2 animate-in fade-in slide-in-from-right-2 duration-300">
+                                    <span className="hidden sm:inline">Rows:</span>
+                                    <select
+                                        value={limit}
+                                        onChange={handleLimitChange}
+                                        className="bg-white border border-gray-300 text-gray-700 text-xs rounded focus:ring-blue-500 focus:border-blue-500 block p-1 py-1.5 cursor-pointer shadow-sm"
+                                    >
+                                        <option value={10}>10</option>
+                                        <option value={20}>20</option>
+                                        <option value={50}>50</option>
+                                        <option value={100}>100</option>
+                                    </select>
+                                </div>
+                            )}
+
+                            <div className="flex bg-gray-100 rounded-lg p-0.5">
+                                <button
+                                    onClick={() => {
+                                        setViewMode('table');
+                                    }}
+                                    className={`px-3 py-1.5 rounded-md flex items-center gap-2 transition-all ${viewMode === 'table' ? 'bg-white shadow text-blue-600' : 'hover:text-gray-700'}`}
                                 >
-                                    <option value={10}>10</option>
-                                    <option value={20}>20</option>
-                                    <option value={50}>50</option>
-                                    <option value={100}>100</option>
-                                </select>
+                                    <FontAwesomeIcon icon={faList} />
+                                    <span className="hidden sm:inline">Table</span>
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        setViewMode('grid');
+                                    }}
+                                    className={`px-3 py-1.5 rounded-md flex items-center gap-2 transition-all ${viewMode === 'grid' ? 'bg-white shadow text-blue-600' : 'hover:text-gray-700'}`}
+                                >
+                                    <FontAwesomeIcon icon={faTh} />
+                                    <span className="hidden sm:inline">Gallery</span>
+                                </button>
                             </div>
-                        )}
-
-                        <div className="flex bg-gray-100 rounded-lg p-0.5">
-                            <button
-                                onClick={() => {
-                                    setViewMode('table');
-                                }}
-                                className={`px-3 py-1.5 rounded-md flex items-center gap-2 transition-all ${viewMode === 'table' ? 'bg-white shadow text-blue-600' : 'hover:text-gray-700'}`}
-                            >
-                                <FontAwesomeIcon icon={faList} />
-                                <span className="hidden sm:inline">Table</span>
-                            </button>
-                            <button
-                                onClick={() => {
-                                    setViewMode('grid');
-                                }}
-                                className={`px-3 py-1.5 rounded-md flex items-center gap-2 transition-all ${viewMode === 'grid' ? 'bg-white shadow text-blue-600' : 'hover:text-gray-700'}`}
-                            >
-                                <FontAwesomeIcon icon={faTh} />
-                                <span className="hidden sm:inline">Gallery</span>
-                            </button>
                         </div>
                     </div>
                 </div>
             </div>
 
             {/* Content area */}
-            <div className="flex-1 overflow-hidden relative">
+            <div className="flex-1 overflow-hidden relative bg-white">
                 {songs.length === 0 && !isLoading ? (
                     <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400">
                         <p>No songs found...</p>
                     </div>
                 ) : viewMode === 'grid' ? (
-                    <VirtuosoGrid
-                        data={songs}
-                        endReached={loadMore}
-                        overscan={200}
-                        components={gridComponents}
-                        itemContent={(_, song) => (
-                            <SongCard
-                                song={song}
-                                isPlaying={currentSongId === song.id && isPlaying}
-                                onToggle={() => {
-                                    handlePlayToggle(song);
-                                }}
-                            />
-                        )}
-                    />
+                    <div className="max-w-7xl mx-auto w-full h-full">
+                        <VirtuosoGrid
+                            data={songs}
+                            endReached={loadMore}
+                            overscan={200}
+                            components={gridComponents}
+                            itemContent={(_, song) => (
+                                <SongCard
+                                    song={song}
+                                    isPlaying={currentSongId === song.id && isPlaying}
+                                    onToggle={() => {
+                                        handlePlayToggle(song);
+                                    }}
+                                />
+                            )}
+                        />
+                    </div>
                 ) : (
-                    <TableVirtuoso
-                        data={songs}
-                        fixedHeaderContent={tableHeaderContent}
-                        components={tableComponents}
-                        itemContent={(_, song) => (
-                            <SongRowCells
-                                index={song.index}
-                                song={song}
-                                isPlaying={currentSongId === song.id && isPlaying}
-                                isExpanded={expandedRowId === song.id}
-                                onTogglePlay={() => {
-                                    handlePlayToggle(song);
-                                }}
-                                onToggleExpand={() => {
-                                    handleRowExpand(song.id);
-                                }}
-                            />
-                        )}
-                        fixedFooterContent={tableFooterContent}
-                    />
+                    <div className="max-w-7xl mx-auto w-full h-full">
+                        <TableVirtuoso
+                            data={songs}
+                            fixedHeaderContent={tableHeaderContent}
+                            components={tableComponents}
+                            itemContent={(_, song) => (
+                                <SongRowCells
+                                    index={song.index}
+                                    song={song}
+                                    isPlaying={currentSongId === song.id && isPlaying}
+                                    isExpanded={expandedRowId === song.id}
+                                    onTogglePlay={() => {
+                                        handlePlayToggle(song);
+                                    }}
+                                    onToggleExpand={() => {
+                                        handleRowExpand(song.id);
+                                    }}
+                                />
+                            )}
+                            fixedFooterContent={tableFooterContent}
+                        />
+                    </div>
                 )}
             </div>
         </div>

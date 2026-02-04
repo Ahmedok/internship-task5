@@ -110,7 +110,7 @@ export const SongRowCells: React.FC<SongRowCellsProps> = ({
             {/* Index */}
             <td
                 onClick={onToggleExpand}
-                className="px-4 py-3 text-sm text-gray-400 font-mono text-center w-12 cursor-pointer"
+                className="px-4 py-3 text-sm text-gray-400 font-mono text-center cursor-pointer"
             >
                 {index}
             </td>
@@ -140,7 +140,7 @@ export const SongRowCells: React.FC<SongRowCellsProps> = ({
             {/* Artist */}
             <td
                 onClick={onToggleExpand}
-                className="px-4 py-3 text-sm text-gray-600 hidden md:table-cell cursor-pointer"
+                className="px-4 py-3 text-sm text-gray-600 hidden sm:table-cell cursor-pointer"
             >
                 {song.artist}
             </td>
@@ -148,13 +148,13 @@ export const SongRowCells: React.FC<SongRowCellsProps> = ({
             {/* Album */}
             <td
                 onClick={onToggleExpand}
-                className="px-4 py-3 text-sm text-gray-500 hidden lg:table-cell cursor-pointer"
+                className="px-4 py-3 text-sm text-gray-500 hidden xl:table-cell cursor-pointer"
             >
                 {song.album}
             </td>
 
             {/* Genre + instrument */}
-            <td onClick={onToggleExpand} className="px-4 py-3 hidden sm:table-cell cursor-pointer">
+            <td onClick={onToggleExpand} className="px-4 py-3 hidden lg:table-cell cursor-pointer">
                 <div className="flex items-center gap-2">
                     <span className="text-sm text-gray-500">{song.genre}</span>
                     <FontAwesomeIcon
@@ -165,7 +165,7 @@ export const SongRowCells: React.FC<SongRowCellsProps> = ({
             </td>
 
             {/* Likes */}
-            <td className="px-4 py-3 text-sm font-mono text-right w-24">
+            <td className="px-4 py-3 text-sm font-mono text-right">
                 <div className="flex items-center justify-end gap-1 text-blue-600 font-bold">
                     <FontAwesomeIcon icon={faHeart} className="text-red-500" />
                     {song.likes}

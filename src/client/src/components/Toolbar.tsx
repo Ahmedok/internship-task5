@@ -15,7 +15,7 @@ type ToolbarProps = {
 
 const LOCALES = [
     { value: 'en_US', label: 'English (USA)' },
-    { value: 'de', label: 'German' },
+    { value: 'ru', label: 'Russian' },
 ];
 
 export const Toolbar: React.FC<ToolbarProps> = ({
@@ -41,7 +41,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
 
     return (
         // Container
-        <div className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur border-b border-gray-200 shadow-sm">
+        <div className="sticky top-0 z-50 w-full bg-white border-b border-gray-200 shadow-sm">
             <div className="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center gap-4 md:gap-8">
                 {/* Region select */}
                 <div className="flex flex-col gap-1 min-w-[150px]">
@@ -122,7 +122,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
                     <button
                         onClick={onExport}
                         disabled={isExporting}
-                        className="bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium py-2 px-4 rounded-md shadow-sm transition-all disabled:opacity-70 disabled:cursor-wait flex items-center gap-2"
+                        className="bg-gray-900 hover:bg-purple-800 text-white text-sm font-medium py-2 px-4 rounded-md shadow-sm cursor-pointer transition-all disabled:opacity-70 disabled:cursor-wait flex items-center gap-2"
                     >
                         {isExporting ? (
                             <>
