@@ -11,7 +11,6 @@ import { generateCoverSvg } from './coverGenerator.js';
 
 const app: Express = express();
 const PORT = process.env.PORT ?? '3000';
-const BATCH_SIZE = 10;
 
 app.use(cors());
 
@@ -30,15 +29,19 @@ app.get('/api/data', (req: Request, res: Response): void => {
         const locale = (req.query.locale as string) || 'en_US';
         const avgLikes = parseFloat(req.query.likes as string) || 0;
 
+        // Limit set (with safety)
+        let limit = Number(req.query.limit) || 10;
+        limit = Math.max(1, Math.min(100, limit));
+
         // Locale set
         const currentFaker = FAKER_LOCALES[locale];
 
         const songs: Song[] = [];
 
         // Batch generation (global index)
-        const startAbsoluteIndex = (page - 1) * BATCH_SIZE;
+        const startAbsoluteIndex = (page - 1) * limit;
 
-        for (let i = 0; i < BATCH_SIZE; i++) {
+        for (let i = 0; i < limit; i++) {
             const absoluteIndex = startAbsoluteIndex + i + 1;
 
             // Seed + index combo
@@ -82,6 +85,7 @@ app.get('/api/data', (req: Request, res: Response): void => {
         const response: ApiResponse = {
             seed,
             page,
+            limit,
             songs,
         };
 

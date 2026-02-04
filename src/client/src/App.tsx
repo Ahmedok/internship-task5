@@ -30,6 +30,7 @@ function App() {
     // UI states
     const [viewMode, setViewMode] = useState<'grid' | 'table'>('table');
     const [expandedRowId, setExpandedRowId] = useState<string | null>(null);
+    const [limit, setLimit] = useState<number>(20);
 
     // Data hooks
     const { songs, isLoading, page, setPageManual, loadMore } = useSongs({
@@ -37,6 +38,7 @@ function App() {
         locale,
         likes,
         mode: viewMode === 'grid' ? 'infinite' : 'pagination',
+        limit,
     });
     const { isPlaying, currentSongId, play, stop } = useAudioPlayer();
     const { exportZip, isExporting } = useSongExport();
@@ -52,6 +54,11 @@ function App() {
 
     const handleRowExpand = (id: string) => {
         setExpandedRowId((prev) => (prev === id ? null : id));
+    };
+
+    const handleLimitChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setLimit(Number(e.target.value));
+        setPageManual(1);
     };
 
     const handleExport = () => {
@@ -161,30 +168,50 @@ function App() {
 
                 {/* Sub-header */}
                 <div className="bg-white border-b border-gray-200 px-4 py-2 flex justify-between items-center text-xs font-medium text-gray-500">
+                    {/* Left */}
                     <div className="flex items-center gap-2">
                         <FontAwesomeIcon icon={faMusic} className="text-blue-500" />
                         <span>{songs.length} songs loaded</span>
                     </div>
 
-                    <div className="flex bg-gray-100 rounded-lg p-0.5">
-                        <button
-                            onClick={() => {
-                                setViewMode('table');
-                            }}
-                            className={`px-3 py-1.5 rounded-md flex items-center gap-2 transition-all ${viewMode === 'table' ? 'bg-white shadow text-blue-600' : 'hover:text-gray-700'}`}
-                        >
-                            <FontAwesomeIcon icon={faList} />
-                            <span className="hidden sm:inline">Table</span>
-                        </button>
-                        <button
-                            onClick={() => {
-                                setViewMode('grid');
-                            }}
-                            className={`px-3 py-1.5 rounded-md flex items-center gap-2 transition-all ${viewMode === 'grid' ? 'bg-white shadow text-blue-600' : 'hover:text-gray-700'}`}
-                        >
-                            <FontAwesomeIcon icon={faTh} />
-                            <span className="hidden sm:inline">Gallery</span>
-                        </button>
+                    {/* Right */}
+                    <div className="flex items-center gap-4">
+                        {viewMode === 'table' && (
+                            <div className="flex items-center gap-2 animate-in fade-in slide-in-from-right-2 duration-300">
+                                <span className="hidden sm:inline">Rows:</span>
+                                <select
+                                    value={limit}
+                                    onChange={handleLimitChange}
+                                    className="bg-white border border-gray-300 text-gray-700 text-xs rounded focus:ring-blue-500 focus:border-blue-500 block p-1 py-1.5 cursor-pointer shadow-sm"
+                                >
+                                    <option value={10}>10</option>
+                                    <option value={20}>20</option>
+                                    <option value={50}>50</option>
+                                    <option value={100}>100</option>
+                                </select>
+                            </div>
+                        )}
+
+                        <div className="flex bg-gray-100 rounded-lg p-0.5">
+                            <button
+                                onClick={() => {
+                                    setViewMode('table');
+                                }}
+                                className={`px-3 py-1.5 rounded-md flex items-center gap-2 transition-all ${viewMode === 'table' ? 'bg-white shadow text-blue-600' : 'hover:text-gray-700'}`}
+                            >
+                                <FontAwesomeIcon icon={faList} />
+                                <span className="hidden sm:inline">Table</span>
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setViewMode('grid');
+                                }}
+                                className={`px-3 py-1.5 rounded-md flex items-center gap-2 transition-all ${viewMode === 'grid' ? 'bg-white shadow text-blue-600' : 'hover:text-gray-700'}`}
+                            >
+                                <FontAwesomeIcon icon={faTh} />
+                                <span className="hidden sm:inline">Gallery</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

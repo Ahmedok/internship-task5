@@ -30,4 +30,5 @@ export type ApiResponse = {
     seed: string;
     page: number;
     songs: Song[];
+    limit: number;
 };

@@ -8,9 +8,10 @@ type UseSongsParams = {
     locale: string;
     likes: number;
     mode: 'infinite' | 'pagination';
+    limit?: number;
 };
 
-export function useSongs({ seed, locale, likes, mode }: UseSongsParams) {
+export function useSongs({ seed, locale, likes, mode, limit = 20 }: UseSongsParams) {
     const [songs, setSongs] = useState<Song[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [page, setPage] = useState(1);
@@ -35,6 +36,7 @@ export function useSongs({ seed, locale, likes, mode }: UseSongsParams) {
                     locale,
                     page: pageToFetch.toString(),
                     likes: likes.toString(),
+                    limit: limit.toString(),
                 });
 
                 const res = await fetch(`${API_URL}?${params.toString()}`, {
@@ -67,7 +69,7 @@ export function useSongs({ seed, locale, likes, mode }: UseSongsParams) {
                 }
             }
         },
-        [seed, locale, likes],
+        [seed, locale, likes, limit],
     );
 
     // Seed/locale change reset
