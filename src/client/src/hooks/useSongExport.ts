@@ -62,7 +62,13 @@ export function useSongExport() {
     const [progress, setProgress] = useState(0);
 
     const renderSongToBuffer = async (song: Song): Promise<AudioBuffer> => {
-        const duration = 15;
+        let endTime = 0;
+        [...song.score.melody, ...song.score.bass].forEach((n) => {
+            const eventEnd = Tone.Time(n.time).toSeconds() + Tone.Time(n.duration).toSeconds();
+            if (eventEnd > endTime) endTime = eventEnd;
+        });
+        const tailBuffer = 3;
+        const stopTime = endTime + tailBuffer;
 
         const buffer = await Tone.Offline(({ transport }) => {
             const synth = createMelodySynth(song.score.instrument).toDestination();
@@ -85,7 +91,7 @@ export function useSongExport() {
             });
 
             transport.start();
-        }, duration);
+        }, stopTime);
 
         return buffer as unknown as AudioBuffer;
     };
