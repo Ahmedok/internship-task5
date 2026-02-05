@@ -1,5 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { VirtuosoGrid, TableVirtuoso } from 'react-virtuoso';
+import type { VirtuosoGridHandle, TableVirtuosoHandle } from 'react-virtuoso';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faTh,
@@ -21,18 +22,17 @@ import { SongRowCells } from './components/SongRowCells';
 import type { Song } from '../../lib';
 
 function App() {
-    // States and hooks
-    // RGN params
     const [seed, setSeed] = useState<string>('test');
     const [locale, setLocale] = useState<string>('en_US');
     const [likes, setLikes] = useState<number>(0);
 
-    // UI states
     const [viewMode, setViewMode] = useState<'grid' | 'table'>('table');
     const [expandedRowId, setExpandedRowId] = useState<string | null>(null);
     const [limit, setLimit] = useState<number>(20);
 
-    // Data hooks
+    const gridRef = useRef<VirtuosoGridHandle>(null);
+    const tableRef = useRef<TableVirtuosoHandle>(null);
+
     const { songs, isLoading, page, setPageManual, loadMore } = useSongs({
         seed,
         locale,
@@ -43,7 +43,14 @@ function App() {
     const { isPlaying, currentSongId, play, stop } = useAudioPlayer();
     const { exportZip, isExporting } = useSongExport();
 
-    // Handlers
+    useEffect(() => {
+        if (viewMode === 'grid') {
+            gridRef.current?.scrollToIndex({ index: 0, behavior: 'auto' });
+        } else {
+            tableRef.current?.scrollToIndex({ index: 0, behavior: 'auto' });
+        }
+    }, [seed, locale, likes, limit, viewMode]);
+
     const handlePlayToggle = (song: Song) => {
         if (currentSongId === song.id && isPlaying) {
             stop();
@@ -65,8 +72,6 @@ function App() {
         void exportZip(songs);
     };
 
-    // Virtuoso config
-    // Grid view
     const gridComponents = useMemo(
         () => ({
             List: React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
@@ -88,7 +93,6 @@ function App() {
         [isLoading],
     );
 
-    // Table view
     const tableHeaderContent = () => (
         <tr className="text-xs font-bold text-gray-400 uppercase tracking-wider">
             <th className="py-3 px-4 w-16 text-center">#</th>
@@ -226,9 +230,10 @@ function App() {
                 ) : viewMode === 'grid' ? (
                     <div className="max-w-7xl mx-auto w-full h-full">
                         <VirtuosoGrid
+                            ref={gridRef}
                             data={songs}
                             endReached={loadMore}
-                            overscan={200}
+                            overscan={250}
                             components={gridComponents}
                             itemContent={(_, song) => (
                                 <SongCard
@@ -244,6 +249,7 @@ function App() {
                 ) : (
                     <div className="max-w-7xl mx-auto w-full h-full">
                         <TableVirtuoso
+                            ref={tableRef}
                             data={songs}
                             fixedHeaderContent={tableHeaderContent}
                             components={tableComponents}
