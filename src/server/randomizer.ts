@@ -1,13 +1,19 @@
-import { faker } from '@faker-js/faker';
+import { Faker } from '@faker-js/faker';
 import prand from 'pure-rand';
 
 export class RandomGenerator {
     private rng: prand.RandomGenerator;
+    private faker: Faker;
 
-    constructor(seed: string) {
+    constructor(seed: string, fakerInstance: Faker) {
         const seedNumber = this.hashCode(seed);
         this.rng = prand.xoroshiro128plus(seedNumber);
-        faker.seed(seedNumber);
+
+        const [fakerSeed, nextRng] = prand.uniformIntDistribution(0, 1000000, this.rng);
+        this.rng = nextRng;
+
+        this.faker = fakerInstance;
+        fakerInstance.seed(fakerSeed);
     }
 
     private hashCode(str: string): number {
@@ -37,18 +43,18 @@ export class RandomGenerator {
     }
 
     getSongTitle(): string {
-        return faker.music.songName();
+        return this.faker.music.songName();
     }
 
     getAlbumName(): string {
-        return faker.music.album();
+        return this.faker.music.album();
     }
 
     getArtistName(): string {
-        return faker.music.artist();
+        return this.faker.music.artist();
     }
 
     getGenre(): string {
-        return faker.music.genre();
+        return this.faker.music.genre();
     }
 }
