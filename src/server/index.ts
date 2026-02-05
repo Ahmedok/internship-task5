@@ -8,11 +8,25 @@ import { ApiResponse, Song } from '../lib/index.js';
 import { RandomGenerator } from './randomizer.js';
 import { generateSongScore } from './composer.js';
 import { generateCoverSvg } from './coverGenerator.js';
+import { russianMusicData } from '../lib/musicDataRu.js';
 
 const app: Express = express();
 const PORT = process.env.PORT ?? '3000';
 
 app.use(cors());
+
+// Lib extend
+const {
+    song_name: ruSongName,
+    artist: ruArtist,
+    genre: ruGenre,
+    album: ruAlbum,
+} = russianMusicData;
+
+fakerRU.music.songName = () => fakerRU.helpers.arrayElement(ruSongName);
+fakerRU.music.artist = () => fakerRU.helpers.arrayElement(ruArtist);
+fakerRU.music.genre = () => fakerRU.helpers.arrayElement(ruGenre);
+fakerRU.music.album = () => fakerRU.helpers.arrayElement(ruAlbum);
 
 // Faker "localization"
 const FAKER_LOCALES: Record<string, Faker> = {
