@@ -85,6 +85,18 @@ export function useAudioPlayer() {
             partRef.current = melodyPart;
             bassPartRef.current = bassPart;
 
+            let endTime = 0;
+            [...song.score.melody, ...song.score.bass].forEach((n) => {
+                const eventEnd = Tone.Time(n.time).toSeconds() + Tone.Time(n.duration).toSeconds();
+                if (eventEnd > endTime) endTime = eventEnd;
+            });
+            const buffer = 3;
+            const stopTime = endTime + buffer;
+
+            Tone.getTransport().scheduleOnce(() => {
+                stop();
+            }, stopTime);
+
             // Start playing
             Tone.getTransport().start();
             setCurrentSongId(song.id);
