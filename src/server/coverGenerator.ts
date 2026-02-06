@@ -1,4 +1,4 @@
-import { RandomGenerator } from './randomizer';
+import { RandomGenerator } from './randomizer.js';
 
 function str(n: number | string): string {
     return String(n);

@@ -11,6 +11,7 @@ FROM node:24-alpine AS client-builder
 WORKDIR /app/src/client
 COPY src/client/package*.json ./
 RUN npm install
+COPY src/lib ../lib
 COPY src/client .
 RUN npm run build
 
@@ -20,6 +21,7 @@ WORKDIR /app/src/server
 COPY src/server/package*.json ./
 RUN npm install
 COPY src/server .
+COPY src/lib/ ../lib
 COPY --from=lib-builder /app/src/lib/dist ../lib/dist
 RUN npm run build
 RUN npm prune --production
@@ -32,7 +34,7 @@ ENV NODE_ENV=production
 ENV STATIC_PATH=public
 COPY --from=server-builder /app/src/server/dist ./dist
 COPY --from=server-builder /app/src/server/package*.json ./
-COPY --from=server-builder /app/src/lib/dist ./lib/dist
+COPY --from=lib-builder /app/src/lib/dist ./lib
 COPY --from=client-builder /app/src/client/dist ./public
 COPY --from=server-builder /app/src/server/node_modules ./node_modules
 EXPOSE 3000

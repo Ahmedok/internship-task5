@@ -1,8 +1,8 @@
-import type { Song } from '../lib';
+import type { Song } from '../lib/index.js';
 import type { Faker } from '@faker-js/faker';
-import { RandomGenerator } from './randomizer';
-import { generateCoverSvg } from './coverGenerator';
-import { generateSongScore } from './composer';
+import { RandomGenerator } from './randomizer.js';
+import { generateCoverSvg } from './coverGenerator.js';
+import { generateSongScore } from './composer.js';
 
 export function generateSong(
     seed: string,

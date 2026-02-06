@@ -1,5 +1,5 @@
 import { Key, Chord, Note } from 'tonal';
-import { RandomGenerator } from './randomizer';
+import { RandomGenerator } from './randomizer.js';
 import { SongScore, NoteEvent } from '../lib/index.js';
 
 const ROOTS = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];

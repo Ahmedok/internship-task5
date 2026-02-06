@@ -1,5 +1,5 @@
 import { fakerEN, fakerRU, type Faker } from '@faker-js/faker';
-import { russianMusicData } from '../lib/musicDataRu';
+import { russianMusicData } from '../lib/musicDataRu.js';
 
 const {
     song_name: ruSongName,
