@@ -113,7 +113,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
                         onChange={(e) => {
                             setLikes(parseFloat(e.target.value));
                         }}
-                        className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600 hover:accent-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                        className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600 hover:accent-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600/50"
                     />
                 </div>
 
@@ -122,7 +122,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
                     <button
                         onClick={onExport}
                         disabled={isExporting}
-                        className="bg-gray-900 hover:bg-purple-800 text-white text-sm font-medium py-2 px-4 rounded-md shadow-sm cursor-pointer transition-all disabled:opacity-70 disabled:cursor-wait flex items-center gap-2"
+                        className="bg-gray-900 hover:bg-blue-600 text-white text-sm font-medium py-2 px-4 rounded-md shadow-sm cursor-pointer transition-all disabled:opacity-70 disabled:cursor-wait flex items-center gap-2"
                     >
                         {isExporting ? (
                             <>

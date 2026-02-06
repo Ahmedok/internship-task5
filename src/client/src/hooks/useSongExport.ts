@@ -132,7 +132,7 @@ export function useSongExport() {
 
             const zipBlob = await zipWriter.close();
 
-            downloadBlob(zipBlob, `Music_Score_Export.zip`);
+            downloadBlob(zipBlob, `MP3_Export(${songsSnapshot.length.toString()} tracks).zip`);
         } catch (err) {
             console.log('Export failed:', err);
             alert('Export failed');

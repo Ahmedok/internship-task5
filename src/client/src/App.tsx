@@ -69,7 +69,17 @@ function App() {
     };
 
     const handleExport = () => {
-        void exportZip(songs);
+        if (!songs.length) return;
+        if (songs.length > 50) {
+            alert(
+                'Too many tracks are set to be downloaded! Please reduce the amount to 50 or less.',
+            );
+            return;
+        }
+        const message = `You are about to download an archive of ${songs.length.toString()} tracks.\nThis may take some time.\nContinue?`;
+        if (window.confirm(message)) {
+            void exportZip(songs);
+        }
     };
 
     const gridComponents = useMemo(
