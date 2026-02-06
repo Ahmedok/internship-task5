@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express, { Express, Request, Response } from 'express';
 import path from 'path';
 import cors from 'cors';
+import morgan from 'morgan';
 
 import { ApiResponse } from '../lib/index.js';
 import { parameterValidator } from './parameterValidator.js';
@@ -10,6 +11,15 @@ import { FAKER_LOCALES } from './fakerSetup.js';
 
 const app: Express = express();
 const PORT = process.env.PORT ?? '3000';
+
+app.set('trust proxy', true);
+
+morgan.token('date', () => {
+    const locale = process.env.LOG_LOCALE ?? 'en-US';
+    const tz = process.env.LOG_TIMEZONE ?? 'UTC';
+    return new Date().toLocaleString(locale, { timeZone: tz });
+});
+app.use(morgan('[:date] IP::remote-addr | :method :url | Status: :status | :response-time ms'));
 
 app.use(cors());
 
