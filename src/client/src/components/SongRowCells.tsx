@@ -91,9 +91,7 @@ export const SongRowCells: React.FC<SongRowCellsProps> = ({
                             <span className="absolute -top-2 -left-2 text-4xl text-blue-200 leading-none">
                                 "
                             </span>
-                            A stunning {song.score.instrument} performance. The rhythm at{' '}
-                            {song.score.bpm} BPM creates a unique atmosphere typical for{' '}
-                            {song.genre}.
+                            <span>{song.review}</span>
                             <span className="absolute -bottom-4 -right-1 text-4xl text-blue-200 leading-none">
                                 "
                             </span>

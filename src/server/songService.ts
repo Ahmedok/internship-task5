@@ -18,6 +18,7 @@ export function generateSong(
     const artist = rng.getArtistName();
     const genre = rng.getGenre();
     const album = rng.getAlbumName();
+    const review = rng.getReview();
 
     const baseLikes = Math.floor(avgLikes);
     const fractionalChance = avgLikes - baseLikes;
@@ -34,6 +35,7 @@ export function generateSong(
         artist,
         album,
         genre,
+        review,
         cover,
         score,
         likes: likesCount,

@@ -20,6 +20,7 @@ export type Song = {
     artist: string;
     album: string;
     genre: string;
+    review: string;
 
     cover: string;
     likes: number;

@@ -57,4 +57,8 @@ export class RandomGenerator {
     getGenre(): string {
         return this.faker.music.genre();
     }
+
+    getReview(): string {
+        return this.faker.music.review();
+    }
 }
