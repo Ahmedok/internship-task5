@@ -1,19 +1,19 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import * as Tone from 'tone';
 import type { Song } from '../../../lib';
-import { createMelodySynth, createBassSynth } from '../audioConfig';
+import { createSongAudioChain } from '../audioConfig';
+
+type AudioChain = Awaited<ReturnType<typeof createSongAudioChain>>;
 
 export function useAudioPlayer() {
     const [currentSongId, setCurrentSongId] = useState<string | null>(null);
     const [isPlaying, setIsPlaying] = useState(false);
 
-    const synthRef = useRef<Tone.PolySynth | Tone.PolySynth<Tone.MetalSynth> | null>(null);
-    const bassSynthRef = useRef<Tone.MembraneSynth | null>(null);
+    const audioChainRef = useRef<AudioChain | null>(null);
     const partRef = useRef<Tone.Part | null>(null);
     const bassPartRef = useRef<Tone.Part | null>(null);
 
     const stop = useCallback(() => {
-        // Transport stop
         Tone.getTransport().stop();
         Tone.getTransport().cancel();
 
@@ -25,13 +25,9 @@ export function useAudioPlayer() {
             bassPartRef.current.dispose();
             bassPartRef.current = null;
         }
-        if (synthRef.current) {
-            synthRef.current.dispose();
-            synthRef.current = null;
-        }
-        if (bassSynthRef.current) {
-            bassSynthRef.current.dispose();
-            bassSynthRef.current = null;
+        if (audioChainRef.current) {
+            audioChainRef.current.dispose();
+            audioChainRef.current = null;
         }
 
         setIsPlaying(false);
@@ -46,25 +42,17 @@ export function useAudioPlayer() {
             }
 
             stop();
-            // AudioContext init
+
             await Tone.start();
 
-            // Melody polysynth (refactored to audioConfig)
-            const synth = createMelodySynth(song.score.instrument).toDestination();
+            const audioChain = await createSongAudioChain(song.score.instrument);
+            audioChainRef.current = audioChain;
 
-            // Bass membrane
-            const bass = createBassSynth().toDestination();
-
-            synthRef.current = synth;
-            bassSynthRef.current = bass;
-
-            // JSON Partiture parsing
             const { bpm, melody, bass: bassLines } = song.score;
             Tone.getTransport().bpm.value = bpm;
 
-            // Melody
             const melodyPart = new Tone.Part((time, noteEvent) => {
-                synth.triggerAttackRelease(
+                audioChain.synth.triggerAttackRelease(
                     noteEvent.note,
                     noteEvent.duration,
                     time,
@@ -72,9 +60,8 @@ export function useAudioPlayer() {
                 );
             }, melody).start(0);
 
-            // Bass
             const bassPart = new Tone.Part((time, noteEvent) => {
-                bass.triggerAttackRelease(
+                audioChain.bass.triggerAttackRelease(
                     noteEvent.note,
                     noteEvent.duration,
                     time,
@@ -97,7 +84,6 @@ export function useAudioPlayer() {
                 stop();
             }, stopTime);
 
-            // Start playing
             Tone.getTransport().start();
             setCurrentSongId(song.id);
             setIsPlaying(true);
@@ -105,7 +91,6 @@ export function useAudioPlayer() {
         [currentSongId, stop],
     );
 
-    // Page cleanup
     useEffect(() => {
         return () => {
             stop();

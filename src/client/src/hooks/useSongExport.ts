@@ -3,9 +3,7 @@ import * as Tone from 'tone';
 import { BlobWriter, BlobReader, ZipWriter } from '@zip.js/zip.js';
 import lamejs from '@breezystack/lamejs';
 import type { Song } from '../../../lib';
-import { createBassSynth, createMelodySynth } from '../audioConfig';
-
-// Helper functions
+import { createSongAudioChain } from '../audioConfig';
 
 const floatTo16BitPCM = (input: Float32Array, output: Int16Array) => {
     for (let i = 0; i < input.length; i++) {
@@ -41,22 +39,20 @@ const encodeMp3 = (buffer: AudioBuffer): Blob => {
     return new Blob(mp3Data as BlobPart[], { type: 'audio/mp3' });
 };
 
-// Download natively
 const downloadBlob = (blob: Blob, filename: string) => {
     const url = URL.createObjectURL(blob);
-    // Invisible link
+
     const link = document.createElement('a');
     link.href = url;
     link.download = filename;
-    // Click emulate
+
     document.body.appendChild(link);
     link.click();
-    // Remove immediatelly
+
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
 };
 
-// The hook itself
 export function useSongExport() {
     const [isExporting, setIsExporting] = useState(false);
     const [progress, setProgress] = useState(0);
@@ -70,23 +66,31 @@ export function useSongExport() {
         const tailBuffer = 3;
         const stopTime = endTime + tailBuffer;
 
-        const buffer = await Tone.Offline(({ transport }) => {
-            const synth = createMelodySynth(song.score.instrument).toDestination();
-            const bass = createBassSynth().toDestination();
+        const buffer = await Tone.Offline(async ({ transport }) => {
+            const audioChain = await createSongAudioChain(song.score.instrument);
 
             const { bpm, melody, bass: bassLines } = song.score;
             transport.bpm.value = bpm;
 
-            // Using .schedule instead
             melody.forEach((note) => {
                 transport.schedule((time) => {
-                    synth.triggerAttackRelease(note.note, note.duration, time, note.velocity);
+                    audioChain.synth.triggerAttackRelease(
+                        note.note,
+                        note.duration,
+                        time,
+                        note.velocity,
+                    );
                 }, note.time);
             });
 
             bassLines.forEach((note) => {
                 transport.schedule((time) => {
-                    bass.triggerAttackRelease(note.note, note.duration, time, note.velocity);
+                    audioChain.bass.triggerAttackRelease(
+                        note.note,
+                        note.duration,
+                        time,
+                        note.velocity,
+                    );
                 }, note.time);
             });
 
@@ -99,7 +103,6 @@ export function useSongExport() {
     const exportZip = useCallback(async (songs: Song[]) => {
         if (songs.length === 0) return;
 
-        // Create a snapshot of songs to prevent mutations during async export
         const songsSnapshot = songs.map((s) => ({ ...s, score: { ...s.score } }));
 
         setIsExporting(true);

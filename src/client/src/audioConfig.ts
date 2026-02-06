@@ -23,6 +23,18 @@ export const BASS_CONFIG: MembraneOptions = {
     volume: -5,
 };
 
+export const REVERB_CONFIG = {
+    decay: 1.5,
+    wet: 0.15,
+    preDelay: 0.02,
+};
+
+export const DELAY_CONFIG = {
+    delayTime: '8n.',
+    feedback: 0.3,
+    wet: 0.2,
+};
+
 export function createMelodySynth(instrument: 'synth' | 'metal') {
     if (instrument === 'metal') {
         return new Tone.PolySynth(Tone.MetalSynth, METAL_CONFIG);
@@ -33,4 +45,25 @@ export function createMelodySynth(instrument: 'synth' | 'metal') {
 
 export function createBassSynth() {
     return new Tone.MembraneSynth(BASS_CONFIG);
+}
+
+export async function createSongAudioChain(instrument: 'synth' | 'metal') {
+    const reverb = new Tone.Reverb(REVERB_CONFIG).toDestination();
+    await reverb.ready;
+    const delay = new Tone.FeedbackDelay(DELAY_CONFIG).connect(reverb);
+
+    const synth = createMelodySynth(instrument).connect(delay);
+    const bass = createBassSynth().connect(reverb);
+
+    return {
+        synth,
+        bass,
+        effects: { reverb, delay },
+        dispose: () => {
+            synth.dispose();
+            bass.dispose();
+            reverb.dispose();
+            delay.dispose();
+        },
+    };
 }
