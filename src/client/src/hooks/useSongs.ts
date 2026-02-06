@@ -75,21 +75,28 @@ export function useSongs({ seed, locale, likes, mode, limit = 20 }: UseSongsPara
     // Seed/locale change reset
     useEffect(() => {
         setPage(1);
+        setHasMore(true);
+        setSongs([]);
         void fetchBatch(1, true);
-    }, [seed, locale, likes, mode, fetchBatch]);
+    }, [seed, locale, likes, mode, limit, fetchBatch]);
 
-    const setPageManual = (newPage: number) => {
-        setPage(newPage);
-        void fetchBatch(newPage, true);
-    };
+    const setPageManual = useCallback(
+        (newPage: number) => {
+            setPage(newPage);
+            void fetchBatch(newPage, true);
+        },
+        [fetchBatch],
+    );
 
-    const loadMore = () => {
-        if (!isLoading && hasMore) {
-            const nextPage = page + 1;
-            setPage(nextPage);
+    const loadMore = useCallback(() => {
+        if (isLoading || !hasMore) return;
+
+        setPage((currentPage) => {
+            const nextPage = currentPage + 1;
             void fetchBatch(nextPage, false);
-        }
-    };
+            return nextPage;
+        });
+    }, [isLoading, hasMore, fetchBatch]);
 
     return { songs, isLoading, page, hasMore, loadMore, setPageManual };
 }

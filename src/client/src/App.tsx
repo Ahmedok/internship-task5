@@ -40,6 +40,7 @@ function App() {
         mode: viewMode === 'grid' ? 'infinite' : 'pagination',
         limit,
     });
+    const generationKey = `${seed}-${locale}-${likes.toString()}-${limit.toString()}`;
     const { isPlaying, currentSongId, play, stop } = useAudioPlayer();
     const { exportZip, isExporting } = useSongExport();
 
@@ -240,10 +241,11 @@ function App() {
                 ) : viewMode === 'grid' ? (
                     <div className="max-w-7xl mx-auto w-full h-full">
                         <VirtuosoGrid
+                            key={generationKey}
                             ref={gridRef}
                             data={songs}
                             endReached={loadMore}
-                            overscan={250}
+                            overscan={100}
                             components={gridComponents}
                             itemContent={(_, song) => (
                                 <SongCard
@@ -259,6 +261,7 @@ function App() {
                 ) : (
                     <div className="max-w-7xl mx-auto w-full h-full">
                         <TableVirtuoso
+                            key={generationKey}
                             ref={tableRef}
                             data={songs}
                             fixedHeaderContent={tableHeaderContent}
